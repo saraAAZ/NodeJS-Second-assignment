@@ -114,12 +114,12 @@ app.get("/users/:userId/children/:childId", (req, res) => {
         }
     }
 });
-app.post('/users', (req, res) => {
+app.post('/user', (req, res) => {
     const body = req.body
     if (users.find((user) => user.id == body.id)) {
         res.status(409).json(`User with ${body.id} Id Already Exists`);
     } else {
-        if(((body.isActive==true|| body.isActive==false )&&body.isActive !="")&& !isNaN(body.id) && 
+        if((typeof(body.isActive)=="boolean")&& !isNaN(body.id) && 
         body.balance != "" && body.picture != "" && !isNaN(body.id) && body.name !=""
          && body.gender != "" && body.company != "" && body.email != "" && body.phone !=""){
                 users.push(body);
