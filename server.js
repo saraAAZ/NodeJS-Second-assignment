@@ -114,56 +114,75 @@ app.get("/users/:userId/children/:childId", (req, res) => {
         }
     }
 });
-app.post("/users", (req, res) => {
-    const body = req.body;
-    const userId=require(body.id);
-    const isActive=require(body.isActive);
-    const balance=body.balance;
- const picture =body.picture;
-const age=body.age;
-const name=body.age;
-const gender =body.gender;
-const company=body.company;
-const email=body.email;
-const phone=body.phone;
-    // validation
-    // unique id
-  
-    if (users.find((user) => user.id == userId)) {
-      res.status(409).json(`User with ${userId} Already Exists`);
+app.post('/users', (req, res) => {
+    const body = req.body
+    if (users.find((user) => user.id == body.id)) {
+        res.status(409).json(`User with ${body.id} Id Already Exists`);
     } else {
-      users.push(body);
-      res.status(201).json({msg: ` User ${userId} Is added`});
+        if(((body.isActive==true|| body.isActive==false )&&body.isActive !="")&& !isNaN(body.id) && 
+        body.balance != "" && body.picture != "" && !isNaN(body.id) && body.name !=""
+         && body.gender != "" && body.company != "" && body.email != "" && body.phone !=""){
+                users.push(body);
+                    res.status(201).json({ msg: ` User ${body.id} Id Is added`});
+                    console.log(body)
+
+            }
+            else{
+                res.status(400).json({msg: `Some Field Are Missing`})
+            }
     }
-  });
+
+})
+app.post('/child', (req, res) => {
+    const body = req.body
+    if (children.find((child) => child.id == body.id)) {
+        res.status(409).json(`Child with ${body.id} Id Already Exists`);
+    } else {
+        if(!isNaN(body.id) && body.name !="" && !isNaN(body.parent_id) && !isNaN(body.age)){
+                children.push(body);
+                    res.status(201).json({ msg: ` Child ${body.id} Id Is added`});
+                    console.log(body)
+            }
+            else{
+                res.status(400).json({msg: `Some Field Are Missing`})
+            }
+    }
+
+})
+
 app.delete("/user/:id", (req, res) => {
-const id = req.params.id;
-const user = users.find((user) => user.id == id);
-if (!user) {
-    res.status(404).json({
-      msg: "User Not Found!",
-    });
-} else {
-    const index = users.indexOf(user);
-    users.splice(index, 1);
-    res.status(404).json({msg: ` User ${id} Is Deleted`});
-    
-}
+    const id = req.params.id;
+    const user = users.find((user) => user.id == id);
+    if (! user) {
+        res.status(404).json({msg: "User Not Found!"});
+    } else {
+        const index = users.indexOf(user);
+        users.splice(index, 1);
+        const child = children.filter((child) => {
+            return(child.parent_id == id);
+        });
+        child.map(child => {
+            const childIndex = children.indexOf(child);
+            children.splice(childIndex, 1);
+            console.log(child);
+            res.json("Done")
+        });
+        res.status(404).json({msg: ` User ${id} Is Deleted`});
+    }
+
 });
 
 app.delete("/child/:id", (req, res) => {
     const id = req.params.id;
     const child = children.find((child) => child.id == id);
-    if (!child) {
-        res.status(404).json({
-          msg: "Child Not Found!",
-        });
+    if (! child) {
+        res.status(404).json({msg: "Child Not Found!"});
     } else {
         const index = children.indexOf(child);
         children.splice(index, 1);
         res.status(404).json({msg: ` Child ${id} Is Deleted`});
-        
+
     }
-    });
-    
+});
+
 app.listen(3000, () => console.log("Server started"));
